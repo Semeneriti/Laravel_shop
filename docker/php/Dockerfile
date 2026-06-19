@@ -1,34 +1,28 @@
-FROM php:8.4-fpm-alpine
+FROM php:8.2-fpm
 
-# Install dependencies
-RUN apk add --no-cache \
-    postgresql-dev \
-    zip \
-    unzip \
+# Установка системных зависимостей
+RUN apt-get update && apt-get install -y \
     git \
     curl \
-    libzip-dev \
-    oniguruma-dev \
-    autoconf \
-    g++ \
-    make
-
-# Install PHP extensions
-RUN docker-php-ext-install \
-    pdo \
-    pdo_pgsql \
-    pgsql \
-    mbstring \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
     zip \
-    opcache \
-    bcmath \
-    exif
+    unzip \
+    libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql pgsql
 
-# Install Composer
+# Установка Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Установка рабочей директории
 WORKDIR /var/www/html
+
+# Копирование файлов проекта
+COPY . .
+
+# Установка зависимостей Composer
+RUN composer install --no-interaction --optimize-autoloader
 
 EXPOSE 9000
 CMD ["php-fpm"]
