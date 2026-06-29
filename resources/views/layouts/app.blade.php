@@ -11,7 +11,17 @@
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">{{ config('app.name', 'Laravel Shop') }}</a>
         <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="{{ route('register.form') }}">Регистрация</a>
+            @auth
+                <span class="nav-link">Привет, {{ Auth::user()->first_name }}!</span>
+                <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-link nav-link">Выйти</button>
+                </form>
+            @endauth
+            @guest
+                <a class="nav-link" href="{{ route('login.form') }}">Вход</a>
+                <a class="nav-link" href="{{ route('register.form') }}">Регистрация</a>
+            @endguest
         </div>
     </div>
 </nav>
