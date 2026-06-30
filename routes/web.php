@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::view('/', 'main')->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register.form');
@@ -21,3 +22,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/change-password', [AuthController::class, 'showChangePasswordForm'])->name('password.form');
     Route::post('/change-password', [AuthController::class, 'updatePassword'])->name('password.update');
 });
+
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+
+Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+Route::get('/categories/{category:slug}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');

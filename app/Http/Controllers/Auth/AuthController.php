@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\DTO\RegisterDto;
@@ -13,16 +15,14 @@ use App\Services\RegistrationService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function __construct(
         private readonly RegistrationService $userService,
-    ) {}
+    ) {
+    }
 
     public function showRegistrationForm(): Factory|View
     {

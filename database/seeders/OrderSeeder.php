@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\User;
 use App\Models\Product;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class OrderSeeder extends Seeder
 {

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Cart;
 use App\Models\CartItem;
-use App\Models\User;
 use App\Models\Product;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class CartSeeder extends Seeder
 {
