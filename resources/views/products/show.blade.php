@@ -23,6 +23,7 @@
             <div class="col-md-7">
                 <h1 class="h3 mb-3">{{ $product->name }}</h1>
                 <p class="fs-4 fw-semibold mb-3">{{ number_format($product->price, 0, ',', ' ') }} ₽</p>
+                <p><strong>Категория:</strong> {{ $product->category?->name ?? 'Без категории' }}</p>
 
                 <div class="mb-3 text-muted small">
                     <div>Артикул: {{ $product->sku ?? 'Не указан' }}</div>
@@ -35,7 +36,11 @@
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-primary" disabled>Добавить в корзину</button>
+                    <form method="POST" action="{{ route('cart.items.store', $product) }}" data-ajax-cart="1" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn btn-primary">Добавить в корзину</button>
+                    </form>
                     <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">Назад в каталог</a>
                 </div>
             </div>

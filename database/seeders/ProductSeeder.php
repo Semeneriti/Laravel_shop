@@ -15,6 +15,7 @@ class ProductSeeder extends Seeder
             'name' => 'iPhone 16 Pro',
             'description' => 'Флагманский смартфон Apple с мощным процессором и отличной камерой',
             'price' => 120000,
+            'status' => 'active',
             'image' => 'https://via.placeholder.com/300x300?text=iPhone+16+Pro',
         ]);
 
@@ -22,6 +23,7 @@ class ProductSeeder extends Seeder
             'name' => 'MacBook Pro 16"',
             'description' => 'Мощный ноутбук для разработчиков и дизайнеров',
             'price' => 250000,
+            'status' => 'active',
             'image' => 'https://via.placeholder.com/300x300?text=MacBook+Pro',
         ]);
 
@@ -29,6 +31,7 @@ class ProductSeeder extends Seeder
             'name' => 'Samsung Galaxy S24 Ultra',
             'description' => 'Флагман Samsung с S Pen и лучшей камерой на рынке',
             'price' => 110000,
+            'status' => 'active',
             'image' => 'https://via.placeholder.com/300x300?text=Samsung+S24',
         ]);
 
@@ -36,6 +39,7 @@ class ProductSeeder extends Seeder
             'name' => 'AirPods Max',
             'description' => 'Беспроводные наушники премиум-класса с шумоподавлением',
             'price' => 45000,
+            'status' => 'active',
             'image' => 'https://via.placeholder.com/300x300?text=AirPods+Max',
         ]);
 
@@ -43,6 +47,7 @@ class ProductSeeder extends Seeder
             'name' => 'iPad Pro 12.9"',
             'description' => 'Планшет для работы и творчества с чипом M2',
             'price' => 95000,
+            'status' => 'active',
             'image' => 'https://via.placeholder.com/300x300?text=iPad+Pro',
         ]);
     }

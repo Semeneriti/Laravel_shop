@@ -13,6 +13,19 @@ class Product extends Model
 {
     use HasFactory;
 
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_INACTIVE = 'inactive';
+
+    public const STATUSES = [
+        self::STATUS_ACTIVE,
+        self::STATUS_INACTIVE,
+    ];
+
+    public const STATUS_LABELS = [
+        self::STATUS_ACTIVE => 'Активен',
+        self::STATUS_INACTIVE => 'Неактивен',
+    ];
+
     protected $fillable = [
         'name',
         'description',
@@ -21,6 +34,7 @@ class Product extends Model
         'stock',
         'sku',
         'category_id',
+        'status',
     ];
 
     public function category(): BelongsTo
@@ -36,5 +50,10 @@ class Product extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return self::STATUS_LABELS[$this->status] ?? $this->status;
     }
 }

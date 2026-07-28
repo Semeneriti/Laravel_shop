@@ -28,3 +28,30 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 
 Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category:slug}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
+
+Route::get('/cart', [\App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/items/{product}', [\App\Http\Controllers\CartController::class, 'store'])->name('cart.items.store');
+Route::patch('/cart/items/{product}', [\App\Http\Controllers\CartController::class, 'update'])->name('cart.items.update');
+Route::delete('/cart/items/{product}', [\App\Http\Controllers\CartController::class, 'destroy'])->name('cart.items.destroy');
+Route::delete('/cart', [\App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders', [\App\Http\Controllers\OrderController::class, 'store'])->name('orders.store');
+    Route::patch('/orders/{order}/status', [\App\Http\Controllers\OrderController::class, 'updateStatus'])
+        ->name('orders.status.update');
+});
+
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+        Route::patch('users/{user}/password', [\App\Http\Controllers\Admin\UserController::class, 'resetPassword'])->name('users.password');
+        Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
+        Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
+    });
