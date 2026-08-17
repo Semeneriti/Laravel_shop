@@ -18,7 +18,8 @@ class OrderController extends Controller
 {
     public function __construct(
         private readonly OrderService $orderService,
-    ) {}
+    ) {
+    }
 
     public function index(): Factory|View
     {

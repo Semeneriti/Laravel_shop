@@ -7,7 +7,8 @@ namespace App\DTO;
 class RoleDto
 {
     public function __construct(
-        public readonly string ,
-        public readonly string ,
-    ) {}
+        public readonly string $name,
+        public readonly string $slug,
+    ) {
+    }
 }

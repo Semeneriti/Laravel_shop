@@ -19,7 +19,8 @@ class CartController extends Controller
 {
     public function __construct(
         private readonly SessionCartService $sessionCartService,
-    ) {}
+    ) {
+    }
 
     public function index(): Factory|View
     {

@@ -9,13 +9,14 @@ use App\Http\Requests\CartRequest;
 class CartDto
 {
     public function __construct(
-        public readonly int ,
-    ) {}
+        public readonly int $quantity,
+    ) {
+    }
 
-    public static function fromRequest(CartRequest ): self
+    public static function fromRequest(CartRequest $request): self
     {
         return new self(
-            quantity: (int) (->validated('quantity') ?? 1),
+            quantity: (int) ($request->validated('quantity') ?? 1),
         );
     }
 }

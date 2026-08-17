@@ -1,0 +1,63 @@
+ Image laravel-php-fpm Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 578B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 572B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/php:8.2-fpm
+#3 DONE 0.4s
+
+#4 [internal] load metadata for docker.io/library/composer:latest
+#4 DONE 0.4s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 32B done
+#6 DONE 0.0s
+
+#7 FROM docker.io/library/composer:latest@sha256:4d71c3c2109c61d5415544264b59ad4087e4c5b7244481723664138fd36d5040
+#7 resolve docker.io/library/composer:latest@sha256:4d71c3c2109c61d5415544264b59ad4087e4c5b7244481723664138fd36d5040 0.1s done
+#7 CANCELED
+
+#8 [stage-0 2/7] RUN apt-get update && apt-get install -y     git     curl     libpng-dev     libonig-dev     libxml2-dev     zip     unzip     libpq-dev     && docker-php-ext-install pdo pdo_pgsql pgsql sockets
+#8 CACHED
+
+#9 [stage-0 3/7] COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+#9 CACHED
+
+#10 [stage-0 4/7] WORKDIR /var/www/html
+#10 CACHED
+
+#11 [stage-0 5/7] COPY composer.json ./
+#11 ERROR: failed to calculate checksum of ref wo199d04g73tt16szl93qi4yx::q102qggqzc350qt3a7n8zf0g7: "/composer.json": not found
+
+#12 [stage-0 1/7] FROM docker.io/library/php:8.2-fpm@sha256:07da04f452476c49f810c2081a2ce38536003041d5b70383350c66e49e4485f8
+#12 resolve docker.io/library/php:8.2-fpm@sha256:07da04f452476c49f810c2081a2ce38536003041d5b70383350c66e49e4485f8 0.1s done
+#12 CANCELED
+------
+ > [stage-0 5/7] COPY composer.json ./:
+------
+Dockerfile:19
+
+--------------------
+
+  17 |     
+
+  18 |     # Копируем только composer.json
+
+  19 | >>> COPY composer.json ./
+
+  20 |     
+
+  21 |     RUN composer install --no-interaction --optimize-autoloader
+
+--------------------
+
+failed to solve: failed to compute cache key: failed to calculate checksum of ref wo199d04g73tt16szl93qi4yx::q102qggqzc350qt3a7n8zf0g7: "/composer.json": not found
+

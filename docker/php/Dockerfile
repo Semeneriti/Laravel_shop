@@ -1,6 +1,5 @@
-FROM php:8.2-fpm
+FROM php:8.4-fpm
 
-# Установка системных зависимостей
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,18 +9,15 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql pgsql
+    && docker-php-ext-install pdo pdo_pgsql pgsql sockets
 
-# Установка Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Установка рабочей директории
 WORKDIR /var/www/html
 
-# Копирование файлов проекта
+# Копируем ВСЁ сразу (включая artisan)
 COPY . .
 
-# Установка зависимостей Composer
 RUN composer install --no-interaction --optimize-autoloader
 
 EXPOSE 9000

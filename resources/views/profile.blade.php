@@ -10,6 +10,16 @@
                     <div class="card-body p-4">
                         <h2 class="card-title text-center mb-4">Профиль</h2>
 
+                        @if (Auth::user()->hasVerifiedEmail() == false)
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <strong>Ваш email не подтверждён!</strong> Проверьте почту или <a href="{{ route('verification.send') }}" onclick="event.preventDefault(); document.getElementById('resend-verify-form').submit();">отправьте ссылку повторно</a>.
+                                <form id="resend-verify-form" method="POST" action="{{ route('verification.send') }}" style="display: none;">
+                                    @csrf
+                                </form>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
+
                         @if(session('success'))
                             <div class="alert alert-success">{{ session('success') }}</div>
                         @endif

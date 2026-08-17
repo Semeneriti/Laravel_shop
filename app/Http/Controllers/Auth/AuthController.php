@@ -11,6 +11,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\PasswordUpdateRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Jobs\SendRegistrationVerificationJob;
 use App\Services\RegistrationService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -33,6 +34,7 @@ class AuthController extends Controller
     {
         $dto = RegisterDto::fromRequest($request);
         $user = $this->userService->register($dto);
+        SendRegistrationVerificationJob::dispatch($user->id);
 
         return redirect()
             ->route('login.form')
