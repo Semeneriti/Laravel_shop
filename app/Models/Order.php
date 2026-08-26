@@ -73,3 +73,25 @@ class Order extends Model
         return self::PAYMENT_METHOD_LABELS[$this->payment_method] ?? $this->payment_method;
     }
 }
+
+    public const PAYMENT_METHOD_YOOKASSA = 'yookassa';
+
+    public const PAYMENT_METHODS = [
+        self::PAYMENT_METHOD_CASH,
+        self::PAYMENT_METHOD_YOOKASSA,
+    ];
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
+
+    public function latestPayment(): ?OrderPayment
+    {
+        return $this->payments()->latest()->first();
+    }
+
+    public function getPaymentMethodLabelAttribute(): string
+    {
+        return self::PAYMENT_METHOD_LABELS[$this->payment_method] ?? $this->payment_method;
+    }

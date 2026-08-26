@@ -1,0 +1,40 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class OrderPayment extends Model
+{
+    protected $fillable = [
+        'order_id',
+        'provider',
+        'status',
+        'amount',
+        'currency',
+        'external_payment_id',
+        'idempotence_key',
+        'confirmation_url',
+        'request_payload',
+        'response_payload',
+        'paid_at',
+        'canceled_at',
+        'error_message',
+    ];
+
+    protected $casts = [
+        'request_payload' => 'array',
+        'response_payload' => 'array',
+        'paid_at' => 'datetime',
+        'canceled_at' => 'datetime',
+        'amount' => 'decimal:2',
+    ];
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
+    }
+}

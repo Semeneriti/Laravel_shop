@@ -9,13 +9,12 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql pgsql sockets
+    && docker-php-ext-install pdo pdo_pgsql pgsql sockets bcmath
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Копируем ВСЁ сразу (включая artisan)
 COPY . .
 
 RUN composer install --no-interaction --optimize-autoloader

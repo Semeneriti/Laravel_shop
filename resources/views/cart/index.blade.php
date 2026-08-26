@@ -80,3 +80,14 @@
         @endif
     </div>
 @endsection
+    <div class="form-check mt-1">
+        <input class="form-check-input"
+               type="radio"
+               name="payment_method"
+               id="payment-yookassa"
+               value="yookassa"
+               @checked(old('payment_method') === 'yookassa')>
+        <label class="form-check-label" for="payment-yookassa">
+            Онлайн через YooKassa: карта, СБП, SberPay, T-Pay, Alfa Pay
+        </label>
+    </div>

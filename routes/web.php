@@ -84,3 +84,13 @@ Route::post('/email/verification-notification', function (Illuminate\Http\Reques
     $request->user()->sendEmailVerificationNotification();
     return back()->with('success', 'Ссылка для подтверждения отправлена.');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+use App\Http\Controllers\YooKassaController;
+
+Route::middleware('auth')->group(function () {
+    Route::get('/payments/yookassa/return/{order}', [YooKassaController::class, 'return'])
+        ->name('payments.yookassa.return');
+});
+
+Route::post('/payments/yookassa/webhook', [YooKassaController::class, 'webhook'])
+    ->name('payments.yookassa.webhook');

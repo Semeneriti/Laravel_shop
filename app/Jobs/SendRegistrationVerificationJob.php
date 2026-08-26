@@ -14,7 +14,10 @@ use Illuminate\Queue\SerializesModels;
 
 class SendRegistrationVerificationJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 3;
 
@@ -32,9 +35,7 @@ class SendRegistrationVerificationJob implements ShouldQueue
         $user = User::query()->find($this->userId);
 
         if (!$user) {
-            return // не информативный,исправить!!!Добавить сообщение об ошибке;
-            //добавить логирование, эрор "такого юзера нет,отправка невозможна
-            //почитать как лог написать, время хранения
+            return;
         }
 
         $notificationService->sendEmailVerification($user);
