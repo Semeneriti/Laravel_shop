@@ -29,10 +29,18 @@ class Order extends Model
 
     public const PAYMENT_METHOD_CASH = 'cash';
     public const PAYMENT_METHOD_CARD = 'card';
+    public const PAYMENT_METHOD_YOOKASSA = 'yookassa';
 
     public const PAYMENT_METHOD_LABELS = [
         self::PAYMENT_METHOD_CASH => 'Наличными при получении',
         self::PAYMENT_METHOD_CARD => 'Картой при получении',
+        self::PAYMENT_METHOD_YOOKASSA => 'Онлайн через YooKassa',
+    ];
+
+    public const PAYMENT_METHODS = [
+        self::PAYMENT_METHOD_CASH,
+        self::PAYMENT_METHOD_CARD,
+        self::PAYMENT_METHOD_YOOKASSA,
     ];
 
     protected $fillable = [
@@ -63,24 +71,6 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public function getStatusLabelAttribute(): string
-    {
-        return self::STATUS_LABELS[$this->status] ?? $this->status;
-    }
-
-    public function getPaymentMethodLabelAttribute(): string
-    {
-        return self::PAYMENT_METHOD_LABELS[$this->payment_method] ?? $this->payment_method;
-    }
-}
-
-    public const PAYMENT_METHOD_YOOKASSA = 'yookassa';
-
-    public const PAYMENT_METHODS = [
-        self::PAYMENT_METHOD_CASH,
-        self::PAYMENT_METHOD_YOOKASSA,
-    ];
-
     public function payments(): HasMany
     {
         return $this->hasMany(OrderPayment::class);
@@ -91,7 +81,13 @@ class Order extends Model
         return $this->payments()->latest()->first();
     }
 
+    public function getStatusLabelAttribute(): string
+    {
+        return self::STATUS_LABELS[$this->status] ?? $this->status;
+    }
+
     public function getPaymentMethodLabelAttribute(): string
     {
         return self::PAYMENT_METHOD_LABELS[$this->payment_method] ?? $this->payment_method;
     }
+}

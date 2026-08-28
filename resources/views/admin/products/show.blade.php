@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ->name)
+@section('title', $product->name)
 
 @section('content')
     <div class="container py-4">

@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\SalesReportService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(): Factory|View
+    public function index(SalesReportService $salesReportService): Factory|View
     {
-        return view('admin.dashboard');
+        $report = $salesReportService->getLastWeekReport();
+
+        return view('admin.dashboard', compact('report'));
     }
 }

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\DTO\ProductDto;
 use App\DTO\ProductFilterDto;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
+    // ===== КАТАЛОГ =====
     public function getProducts(ProductFilterDto $dto): LengthAwarePaginator
     {
         $query = Product::query();
 
-        // Поиск по названию
         if ($dto->q) {
             $q = $dto->q;
             $query->where(function ($subQuery) use ($q) {
@@ -24,22 +26,18 @@ class ProductService
             });
         }
 
-        // Цена: от
         if ($dto->min_price !== null) {
             $query->where('price', '>=', $dto->min_price);
         }
 
-        // Цена: до
         if ($dto->max_price !== null) {
             $query->where('price', '<=', $dto->max_price);
         }
 
-        // В наличии
         if ($dto->in_stock) {
             $query->where('stock', '>', 0);
         }
 
-        // Сортировка
         switch ($dto->sort) {
             case 'price_asc':
                 $query->orderBy('price', 'asc');
@@ -85,5 +83,44 @@ class ProductService
             ->where('category_id', $categoryId);
 
         return $this->getProducts($dto);
+    }
+
+    // ===== АДМИНКА (CRUD) =====
+
+    public function create(ProductDto $dto): Product
+    {
+        $data = $dto->toProductData();
+
+        if ($dto->image) {
+            $data['image'] = $dto->image->store('products', 'public');
+        }
+
+        return Product::create($data);
+    }
+
+    public function update(Product $product, ProductDto $dto): Product
+    {
+        $data = $dto->toProductData();
+
+        if ($dto->image) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+
+            $data['image'] = $dto->image->store('products', 'public');
+        }
+
+        $product->update($data);
+
+        return $product;
+    }
+
+    public function delete(Product $product): void
+    {
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        $product->delete();
     }
 }
