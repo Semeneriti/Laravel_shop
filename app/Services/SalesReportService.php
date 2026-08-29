@@ -4,94 +4,97 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\DailySalesReport;
 use App\Models\Order;
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use Illuminate\Support\Collection;
 
 class SalesReportService
 {
-    public function getLastWeekReport(): array
+    private const REPORT_DAYS = 7;
+
+    private const SUCCESSFUL_ORDER_STATUSES = [
+        Order::STATUS_PAID,
+        Order::STATUS_SHIPPED,
+        Order::STATUS_COMPLETED,
+    ];
+
+    public function refreshRecentReports(): void
     {
-        $endDate = Carbon::now()->endOfDay();
-        $startDate = Carbon::now()->subDays(6)->startOfDay();
+        for ($daysAgo = 0; $daysAgo < self::REPORT_DAYS; $daysAgo++) {
+            $date = now()
+                ->startOfDay()
+                ->subDays($daysAgo);
 
-        // Всего заказов за неделю
-        $ordersCount = Order::query()
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->count();
-
-        // Успешных продаж (paid, shipped, completed)
-        $salesCount = Order::query()
-            ->whereIn('status', [
-                Order::STATUS_PAID,
-                Order::STATUS_SHIPPED,
-                Order::STATUS_COMPLETED,
-            ])
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->count();
-
-        // Выручка
-        $revenue = Order::query()
-            ->whereIn('status', [
-                Order::STATUS_PAID,
-                Order::STATUS_SHIPPED,
-                Order::STATUS_COMPLETED,
-            ])
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->sum('total');
-
-        // Отменённые заказы
-        $canceledCount = Order::query()
-            ->where('status', Order::STATUS_CANCELED)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->count();
-
-        // Продажи по дням
-        $dailySales = $this->getDailySales($startDate, $endDate);
-
-        return [
-            'ordersCount' => $ordersCount,
-            'salesCount' => $salesCount,
-            'revenue' => $revenue,
-            'canceledCount' => $canceledCount,
-            'dailySales' => $dailySales,
-        ];
+            $this->refreshReportForDate($date);
+        }
     }
 
-    private function getDailySales(Carbon $startDate, Carbon $endDate): array
+    public function refreshReportForDate(CarbonInterface $date): DailySalesReport
     {
-        $days = [];
-        $current = clone $startDate;
+        $startOfDay = $date->copy()->startOfDay();
+        $endOfDay = $date->copy()->endOfDay();
 
-        while ($current <= $endDate) {
-            $date = $current->copy();
+        $ordersQuery = Order::query()
+            ->whereBetween('created_at', [
+                $startOfDay,
+                $endOfDay,
+            ]);
 
-            $sales = Order::query()
-                ->whereIn('status', [
-                    Order::STATUS_PAID,
-                    Order::STATUS_SHIPPED,
-                    Order::STATUS_COMPLETED,
-                ])
-                ->whereDate('created_at', $date)
-                ->count();
+        $ordersCount = (clone $ordersQuery)->count();
 
-            $revenue = Order::query()
-                ->whereIn('status', [
-                    Order::STATUS_PAID,
-                    Order::STATUS_SHIPPED,
-                    Order::STATUS_COMPLETED,
-                ])
-                ->whereDate('created_at', $date)
-                ->sum('total');
+        $salesCount = (clone $ordersQuery)
+            ->whereIn('status', self::SUCCESSFUL_ORDER_STATUSES)
+            ->count();
 
-            $days[] = [
-                'date' => $date->format('d.m.Y'),
-                'sales' => $sales,
+        $revenue = (clone $ordersQuery)
+            ->whereIn('status', self::SUCCESSFUL_ORDER_STATUSES)
+            ->sum('total');
+
+        $canceledCount = (clone $ordersQuery)
+            ->where('status', Order::STATUS_CANCELED)
+            ->count();
+
+        return DailySalesReport::query()->updateOrCreate(
+            [
+                'report_date' => $date->toDateString(),
+            ],
+            [
+                'orders_count' => $ordersCount,
+                'sales_count' => $salesCount,
                 'revenue' => $revenue,
-            ];
+                'canceled_count' => $canceledCount,
+                'calculated_at' => now(),
+            ]
+        );
+    }
 
-            $current->addDay();
-        }
+    public function getRecentReports(): Collection
+    {
+        return DailySalesReport::query()
+            ->whereDate(
+                'report_date',
+                '>=',
+                now()->subDays(self::REPORT_DAYS - 1)->toDateString()
+            )
+            ->orderBy('report_date')
+            ->get();
+    }
 
-        return $days;
+    public function getDashboardReport(): array
+    {
+        $reports = $this->getRecentReports();
+
+        return [
+            'orders_count' => $reports->sum('orders_count'),
+            'sales_count' => $reports->sum('sales_count'),
+            'revenue' => $reports->sum(
+                fn (DailySalesReport $report): float =>
+                    (float) $report->revenue
+            ),
+            'canceled_count' => $reports->sum('canceled_count'),
+            'daily_reports' => $reports,
+            'calculated_at' => $reports->max('calculated_at'),
+        ];
     }
 }

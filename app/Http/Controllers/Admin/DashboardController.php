@@ -13,7 +13,7 @@ class DashboardController extends Controller
 {
     public function index(SalesReportService $salesReportService): Factory|View
     {
-        $report = $salesReportService->getLastWeekReport();
+        $report = $salesReportService->getDashboardReport();
 
         return view('admin.dashboard', compact('report'));
     }
