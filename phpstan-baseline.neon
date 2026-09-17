@@ -1,0 +1,85 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Admin/RoleController.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Admin/UserController.php
+
+		-
+			message: '#^Method App\\Services\\OrderService\:\:createOrder\(\) invoked with 2 parameters, 3 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/OrderController.php
+
+		-
+			message: '#^Parameter \#2 \$paymentMethod of method App\\Services\\OrderService\:\:createOrder\(\) expects string, array\<string, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/OrderController.php
+
+		-
+			message: '#^Parameter \#1 \$order of method App\\Services\\OrderService\:\:markAsPaid\(\) expects App\\Models\\Order, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/YooKassaController.php
+
+		-
+			message: '#^Method App\\Models\\Order\:\:latestPayment\(\) should return App\\Models\\OrderPayment\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/Order.php
+
+		-
+			message: '#^Offset ''canceled''\|''completed''\|''paid''\|''pending''\|''shipped'' on array\{pending\: ''Ожидает оплаты'', paid\: ''Оплачен'', shipped\: ''Отправлен'', completed\: ''Завершен'', canceled\: ''Отменен''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Models/Order.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$stock\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/OrderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$product_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/OrderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$quantity\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/OrderService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$stock\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/SessionCartService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/YooKassaPaymentService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/YooKassaPaymentService.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/View/Components/GuestLayout.php

@@ -14,7 +14,11 @@ class ProductFactory extends Factory
             'name' => $this->faker->words(3, true),
             'description' => $this->faker->paragraph(),
             'price' => $this->faker->randomFloat(2, 100, 10000),
-            'image' => $this->faker->imageUrl(300, 300, 'products'),
+            'image' => null,
+            'stock' => $this->faker->numberBetween(1, 100),
+            'sku' => $this->faker->unique()->ean8(),
+            'status' => 'active',
+            'category_id' => null,
         ];
     }
 }
