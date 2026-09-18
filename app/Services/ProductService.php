@@ -8,14 +8,93 @@ use App\DTO\ProductDto;
 use App\DTO\ProductFilterDto;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
-    // ===== КАТАЛОГ =====
+    private const CATALOG_CACHE_TTL = 600;
+
+    private const CATALOG_VERSION_KEY = 'products:catalog:version';
+
     public function getProducts(ProductFilterDto $dto): LengthAwarePaginator
     {
+        $version = $this->getCatalogVersion();
+        $key = $this->buildCatalogKey($dto, $version);
+
+        return Cache::remember($key, self::CATALOG_CACHE_TTL, function () use ($dto) {
+            return $this->buildCatalogQuery($dto)->paginate($dto->per_page);
+        });
+    }
+
+    public function getMaxProductPrice(): int
+    {
+        $version = $this->getCatalogVersion();
+        $key = "products:max_price:v{$version}";
+
+        return Cache::remember($key, self::CATALOG_CACHE_TTL, function () {
+            return (int) (Product::query()->max('price') ?? 0);
+        });
+    }
+
+    public function getProductsByCategoryId(int $categoryId, ProductFilterDto $dto): LengthAwarePaginator
+    {
+        $version = $this->getCatalogVersion();
+        $key = $this->buildCatalogKey($dto, $version, $categoryId);
+
+        return Cache::remember($key, self::CATALOG_CACHE_TTL, function () use ($categoryId, $dto) {
+            return $this->buildCatalogQuery($dto, $categoryId)->paginate($dto->per_page);
+        });
+    }
+
+    public function create(ProductDto $dto): Product
+    {
+        $data = $dto->toProductData();
+
+        if ($dto->image) {
+            $data['image'] = $dto->image->store('products', 'public');
+        }
+
+        $product = Product::create($data);
+        $this->invalidateCatalogCache();
+
+        return $product;
+    }
+
+    public function update(Product $product, ProductDto $dto): Product
+    {
+        $data = $dto->toProductData();
+
+        if ($dto->image) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $dto->image->store('products', 'public');
+        }
+
+        $product->update($data);
+        $this->invalidateCatalogCache();
+
+        return $product;
+    }
+
+    public function delete(Product $product): void
+    {
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        $product->delete();
+        $this->invalidateCatalogCache();
+    }
+
+    private function buildCatalogQuery(ProductFilterDto $dto, ?int $categoryId = null)
+    {
         $query = Product::query();
+
+        if ($categoryId !== null) {
+            $query->where('category_id', $categoryId);
+        }
 
         if ($dto->q) {
             $q = $dto->q;
@@ -63,64 +142,34 @@ class ProductService
                 break;
         }
 
-        $query->orderByDesc('id');
-
-        $perPage = in_array($dto->per_page, [10, 25, 50, 100], true)
-            ? $dto->per_page
-            : 10;
-
-        return $query->paginate($perPage)->withQueryString();
+        return $query->orderByDesc('id');
     }
 
-    public function getMaxProductPrice(): int
+    private function buildCatalogKey(ProductFilterDto $dto, int $version, ?int $categoryId = null): string
     {
-        return (int) (Product::query()->max('price') ?? 0);
+        $params = [
+            'category' => $categoryId,
+            'page' => request()->get('page', 1),
+            'per_page' => $dto->per_page,
+            'q' => $dto->q,
+            'min_price' => $dto->min_price,
+            'max_price' => $dto->max_price,
+            'in_stock' => $dto->in_stock,
+            'sort' => $dto->sort,
+        ];
+
+        $hash = hash('sha256', json_encode($params));
+
+        return "products:catalog:v{$version}:{$hash}";
     }
 
-    public function getProductsByCategoryId(int $categoryId, ProductFilterDto $dto): LengthAwarePaginator
+    private function getCatalogVersion(): int
     {
-        $query = Product::query()
-            ->where('category_id', $categoryId);
-
-        return $this->getProducts($dto);
+        return (int) Cache::get(self::CATALOG_VERSION_KEY, 1);
     }
 
-    // ===== АДМИНКА (CRUD) =====
-
-    public function create(ProductDto $dto): Product
+    private function invalidateCatalogCache(): void
     {
-        $data = $dto->toProductData();
-
-        if ($dto->image) {
-            $data['image'] = $dto->image->store('products', 'public');
-        }
-
-        return Product::create($data);
-    }
-
-    public function update(Product $product, ProductDto $dto): Product
-    {
-        $data = $dto->toProductData();
-
-        if ($dto->image) {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-
-            $data['image'] = $dto->image->store('products', 'public');
-        }
-
-        $product->update($data);
-
-        return $product;
-    }
-
-    public function delete(Product $product): void
-    {
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
-
-        $product->delete();
+        Cache::increment(self::CATALOG_VERSION_KEY);
     }
 }
