@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Jobs;
+namespace App\Http\Controllers\Jobs;
 
 use App\Services\SalesReportService;
 use Illuminate\Contracts\Queue\ShouldQueue;

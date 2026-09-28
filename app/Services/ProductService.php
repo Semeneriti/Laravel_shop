@@ -32,9 +32,11 @@ class ProductService
         $version = $this->getCatalogVersion();
         $key = "products:max_price:v{$version}";
 
-        return Cache::remember($key, self::CATALOG_CACHE_TTL, function () {
+        $price = Cache::remember($key, self::CATALOG_CACHE_TTL, function () {
             return (int) (Product::query()->max('price') ?? 0);
         });
+
+        return (int) $price;
     }
 
     public function getProductsByCategoryId(int $categoryId, ProductFilterDto $dto): LengthAwarePaginator

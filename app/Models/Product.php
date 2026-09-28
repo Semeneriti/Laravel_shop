@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Services\ElasticsearchService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -36,6 +37,40 @@ class Product extends Model
         'category_id',
         'status',
     ];
+
+    protected static function booted(): void
+    {
+        static::saved(function ($product) {
+            $service = app(ElasticsearchService::class);
+            $service->indexProduct($product->toSearchableArray());
+        });
+
+        static::deleted(function ($product) {
+            $service = app(ElasticsearchService::class);
+            try {
+                $service->getClient()->delete([
+                    'index' => 'products',
+                    'id' => $product->id,
+                ]);
+            } catch (\Exception $e) {
+                logger()->error('Failed to delete product from index: ' . $e->getMessage());
+            }
+        });
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'price' => (float) $this->price,
+            'sku' => $this->sku,
+            'stock' => (int) $this->stock,
+            'status' => $this->status,
+            'created_at' => $this->created_at?->toIso8601String(),
+        ];
+    }
 
     public function category(): BelongsTo
     {

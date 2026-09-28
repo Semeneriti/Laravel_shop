@@ -5,10 +5,17 @@
     "description": "The skeleton application for the Laravel framework.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packagist.jp"
+        }
+    ],
     "require": {
         "php": "^8.3",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
+        "predis/predis": "^3.6",
         "spatie/laravel-data": "^4.23",
         "vladimir-yuldashev/laravel-queue-rabbitmq": "^15.0",
         "yoomoney/yookassa-sdk-php": "^3.15"

@@ -3,9 +3,12 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Jobs\SendWelcomeAfterVerificationJob;
 use App\Http\Controllers\ProductController;
-use App\Jobs\SendWelcomeAfterVerificationJob; // 👈 ДОБАВЛЕНО
+use App\Http\Controllers\YooKassaController;
 use Illuminate\Support\Facades\Route;
+
+// 👈 ДОБАВЛЕНО
 
 Route::view('/', 'main')->name('home');
 
@@ -84,8 +87,6 @@ Route::post('/email/verification-notification', function (Illuminate\Http\Reques
     $request->user()->sendEmailVerificationNotification();
     return back()->with('success', 'Ссылка для подтверждения отправлена.');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
-use App\Http\Controllers\YooKassaController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/payments/yookassa/return/{order}', [YooKassaController::class, 'return'])

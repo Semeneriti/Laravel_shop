@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 
 # Установка PHP-расширений через официальный скрипт
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions pdo pdo_pgsql pgsql sockets bcmath redis
+RUN install-php-extensions pdo pdo_pgsql pgsql sockets bcmath
 
 # Установка Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

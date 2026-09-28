@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Jobs;
+namespace App\Http\Controllers\Jobs;
 
 use App\Models\User;
 use App\Services\UserNotificationService;
